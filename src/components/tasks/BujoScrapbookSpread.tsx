@@ -327,31 +327,58 @@ export const BujoScrapbookSpread: React.FC<BujoScrapbookSpreadProps> = ({
 
               {/* Central Polaroid Memory Photo Card */}
               <div className="relative my-auto flex justify-center py-2">
-                <div className="group relative bg-white p-3 pb-4 rounded-md shadow-lg border border-stone-200/90 max-w-xs sm:max-w-sm rotate-[-1deg] hover:rotate-0 transition-transform">
+                <div
+                  className={`group relative bg-white p-3 pb-4 rounded-md shadow-lg border border-stone-200/90 rotate-[-1deg] hover:rotate-0 transition-all ${
+                    leftTask?.imageSize === 'sm'
+                      ? 'max-w-[200px] sm:max-w-xs'
+                      : leftTask?.imageSize === 'lg'
+                      ? 'max-w-sm sm:max-w-md'
+                      : leftTask?.imageSize === 'xl'
+                      ? 'max-w-md sm:max-w-lg'
+                      : 'max-w-xs sm:max-w-sm'
+                  }`}
+                >
                   
                   {/* Top-Left & Bottom-Right Washi Tape Strips */}
-                  <div className="absolute -top-3 -left-3 w-14 h-5 bg-white/80 border border-stone-300 shadow-2xs rotate-[-30deg] z-20 backdrop-blur-xs" />
-                  <div className="absolute -bottom-3 -right-3 w-14 h-5 bg-white/80 border border-stone-300 shadow-2xs rotate-[-30deg] z-20 backdrop-blur-xs" />
+                  <div className="absolute -top-3 -left-3 w-14 h-5 bg-white/80 border border-stone-300 shadow-2xs rotate-[-30deg] z-20 backdrop-blur-xs pointer-events-none" />
+                  <div className="absolute -bottom-3 -right-3 w-14 h-5 bg-white/80 border border-stone-300 shadow-2xs rotate-[-30deg] z-20 backdrop-blur-xs pointer-events-none" />
 
                   {/* Photo Container */}
-                  <div className="w-full h-44 sm:h-52 rounded bg-stone-100 overflow-hidden relative">
+                  <div
+                    className={`w-full rounded bg-stone-100 overflow-hidden relative ${
+                      leftTask?.imageSize === 'sm'
+                        ? 'h-32 sm:h-36'
+                        : leftTask?.imageSize === 'lg'
+                        ? 'h-52 sm:h-64'
+                        : leftTask?.imageSize === 'xl'
+                        ? 'h-60 sm:h-72'
+                        : 'h-44 sm:h-52'
+                    }`}
+                  >
                     <img
                       src={
                         leftTask?.imageUrl ||
                         'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80'
                       }
                       alt={leftTask?.title || 'Summer Memory'}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full"
+                      style={{
+                        objectFit: leftTask?.imageFit || 'cover',
+                        objectPosition: `${leftTask?.imageFocusX ?? 50}% ${leftTask?.imageFocusY ?? 50}%`,
+                        transform: `scale(${(leftTask?.imageZoom ?? 100) / 100})`,
+                        transition: 'transform 0.2s ease, object-position 0.2s ease',
+                      }}
                     />
 
                     {/* Quick Edit Decoration Button */}
                     <button
                       type="button"
                       onClick={() => setDecoratingItem({ pageSide: 'left', task: leftTask })}
-                      className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/60 hover:bg-black/80 text-white backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
-                      title="Change photo / sticker"
+                      className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/60 hover:bg-black/80 text-white backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity shadow-sm flex items-center gap-1 text-[11px] font-body"
+                      title="Adjust photo size, framing, or change image"
                     >
                       <Camera className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Framing</span>
                     </button>
                   </div>
 
@@ -442,29 +469,56 @@ export const BujoScrapbookSpread: React.FC<BujoScrapbookSpreadProps> = ({
 
               {/* Central Polaroid Memory Photo Card */}
               <div className="relative my-auto flex justify-center py-2">
-                <div className="group relative bg-white p-3 pb-4 rounded-md shadow-lg border border-stone-200/90 max-w-xs sm:max-w-sm rotate-[1deg] hover:rotate-0 transition-transform">
+                <div
+                  className={`group relative bg-white p-3 pb-4 rounded-md shadow-lg border border-stone-200/90 rotate-[1deg] hover:rotate-0 transition-all ${
+                    rightTask?.imageSize === 'sm'
+                      ? 'max-w-[200px] sm:max-w-xs'
+                      : rightTask?.imageSize === 'lg'
+                      ? 'max-w-sm sm:max-w-md'
+                      : rightTask?.imageSize === 'xl'
+                      ? 'max-w-md sm:max-w-lg'
+                      : 'max-w-xs sm:max-w-sm'
+                  }`}
+                >
                   
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-5 bg-white/80 border border-stone-300 shadow-2xs rotate-1 z-20 backdrop-blur-xs" />
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-5 bg-white/80 border border-stone-300 shadow-2xs rotate-1 z-20 backdrop-blur-xs pointer-events-none" />
 
                   {/* Photo Container */}
-                  <div className="w-full h-44 sm:h-52 rounded bg-stone-100 overflow-hidden relative">
+                  <div
+                    className={`w-full rounded bg-stone-100 overflow-hidden relative ${
+                      rightTask?.imageSize === 'sm'
+                        ? 'h-32 sm:h-36'
+                        : rightTask?.imageSize === 'lg'
+                        ? 'h-52 sm:h-64'
+                        : rightTask?.imageSize === 'xl'
+                        ? 'h-60 sm:h-72'
+                        : 'h-44 sm:h-52'
+                    }`}
+                  >
                     <img
                       src={
                         rightTask?.imageUrl ||
                         'https://images.unsplash.com/photo-1508615039623-a25605d2b022?auto=format&fit=crop&w=800&q=80'
                       }
                       alt={rightTask?.title || 'Dandelions after Rain'}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full"
+                      style={{
+                        objectFit: rightTask?.imageFit || 'cover',
+                        objectPosition: `${rightTask?.imageFocusX ?? 50}% ${rightTask?.imageFocusY ?? 50}%`,
+                        transform: `scale(${(rightTask?.imageZoom ?? 100) / 100})`,
+                        transition: 'transform 0.2s ease, object-position 0.2s ease',
+                      }}
                     />
 
                     {/* Quick Edit Decoration Button */}
                     <button
                       type="button"
                       onClick={() => setDecoratingItem({ pageSide: 'right', task: rightTask })}
-                      className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/60 hover:bg-black/80 text-white backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
-                      title="Change photo / sticker"
+                      className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/60 hover:bg-black/80 text-white backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity shadow-sm flex items-center gap-1 text-[11px] font-body"
+                      title="Adjust photo size, framing, or change image"
                     >
                       <Camera className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Framing</span>
                     </button>
                   </div>
 
@@ -600,11 +654,21 @@ export const BujoScrapbookSpread: React.FC<BujoScrapbookSpreadProps> = ({
           currentImageUrl={decoratingItem.task.imageUrl}
           currentImageLayout={decoratingItem.task.imageLayout}
           currentCaption={decoratingItem.task.imageCaption}
+          currentImageSize={decoratingItem.task.imageSize}
+          currentImageZoom={decoratingItem.task.imageZoom}
+          currentImageFocusX={decoratingItem.task.imageFocusX}
+          currentImageFocusY={decoratingItem.task.imageFocusY}
+          currentImageFit={decoratingItem.task.imageFit}
           onSaveDecoration={(dec) => {
             onUpdateTaskBujo(decoratingItem.task!.id, {
               imageUrl: dec.imageUrl,
               imageLayout: dec.imageLayout,
               imageCaption: dec.imageCaption,
+              imageSize: dec.imageSize,
+              imageZoom: dec.imageZoom,
+              imageFocusX: dec.imageFocusX,
+              imageFocusY: dec.imageFocusY,
+              imageFit: dec.imageFit,
             });
             setDecoratingItem(null);
             confetti({

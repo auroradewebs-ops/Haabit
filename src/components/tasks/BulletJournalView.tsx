@@ -965,6 +965,11 @@ export const BulletJournalView: React.FC<BulletJournalViewProps> = ({
                               imageUrl={item.imageUrl}
                               imageLayout={item.imageLayout || 'polaroid'}
                               caption={item.imageCaption}
+                              imageSize={item.imageSize}
+                              imageZoom={item.imageZoom}
+                              imageFocusX={item.imageFocusX}
+                              imageFocusY={item.imageFocusY}
+                              imageFit={item.imageFit}
                               onEdit={() => setDecoratingTask(item)}
                             />
                           </div>
@@ -1013,11 +1018,21 @@ export const BulletJournalView: React.FC<BulletJournalViewProps> = ({
           currentImageUrl={decoratingTask.imageUrl}
           currentImageLayout={decoratingTask.imageLayout}
           currentCaption={decoratingTask.imageCaption}
+          currentImageSize={decoratingTask.imageSize}
+          currentImageZoom={decoratingTask.imageZoom}
+          currentImageFocusX={decoratingTask.imageFocusX}
+          currentImageFocusY={decoratingTask.imageFocusY}
+          currentImageFit={decoratingTask.imageFit}
           onSaveDecoration={(dec) => {
             onUpdateTaskBujo(decoratingTask.id, {
               imageUrl: dec.imageUrl,
               imageLayout: dec.imageLayout,
               imageCaption: dec.imageCaption,
+              imageSize: dec.imageSize,
+              imageZoom: dec.imageZoom,
+              imageFocusX: dec.imageFocusX,
+              imageFocusY: dec.imageFocusY,
+              imageFit: dec.imageFit,
             });
             setDecoratingTask(null);
           }}

@@ -343,6 +343,11 @@ export interface HabitBannerDecoration {
   imageUrl: string | null;
   imageCaption?: string;
   layout?: 'polaroid' | 'sticker' | 'frame';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  zoom?: number; // 100 to 250
+  focusX?: number; // 0 to 100 percentage
+  focusY?: number; // 0 to 100 percentage
+  fit?: 'cover' | 'contain';
 }
 
 export const COZY_MOTIVATIONAL_PHRASES = [
@@ -400,6 +405,11 @@ export function getStoredHabitBannerDecoration(): HabitBannerDecoration {
         imageUrl: null,
         imageCaption: 'Cozy Rituals 🌿',
         layout: 'polaroid',
+        size: 'md',
+        zoom: 100,
+        focusX: 50,
+        focusY: 50,
+        fit: 'cover',
         ...JSON.parse(raw),
       };
     }
@@ -409,6 +419,11 @@ export function getStoredHabitBannerDecoration(): HabitBannerDecoration {
     imageUrl: null,
     imageCaption: 'Cozy Rituals 🌿',
     layout: 'polaroid',
+    size: 'md',
+    zoom: 100,
+    focusX: 50,
+    focusY: 50,
+    fit: 'cover',
   };
 }
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Habit } from '../../types';
-import { IconRenderer } from '../common/IconRenderer';
+import { IconBadge } from '../common/IconRenderer';
 import { SwipeToComplete } from '../common/SwipeToComplete';
 import { getTodayKey } from '../../utils/date';
 import { Flame, Clock, Play, MoreVertical, Edit3, Trash2, Check } from 'lucide-react';
@@ -73,13 +73,12 @@ export const HabitCard: React.FC<HabitCardProps> = ({
       {/* Card Header */}
       <div className="flex items-start justify-between gap-3 mb-3 pt-1">
         <div className="flex items-center gap-3 min-w-0">
-          {/* Icon Badge */}
-          <div
-            className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs border border-black/10 dark:border-white/10 overflow-hidden"
-            style={{ backgroundColor: habit.color || '#8E7CC3' }}
-          >
-            <IconRenderer name={habit.iconName} className="w-5 h-5" size={20} />
-          </div>
+          {/* Icon / Custom Image Badge (Frameless for images) */}
+          <IconBadge
+            name={habit.iconName}
+            color={habit.color || '#8E7CC3'}
+            alt={habit.title}
+          />
 
           <div className="min-w-0">
             <h4

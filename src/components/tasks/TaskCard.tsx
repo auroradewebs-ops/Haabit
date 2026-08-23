@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Task } from '../../types';
-import { IconRenderer } from '../common/IconRenderer';
+import { IconRenderer, IconBadge } from '../common/IconRenderer';
 import { SwipeToComplete } from '../common/SwipeToComplete';
 import { Clock, Calendar, Play, MoreVertical, Edit3, Trash2, Check } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -83,12 +83,11 @@ export const TaskCard: React.FC<TaskCardProps> = ({
       {/* Top Header */}
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex items-center gap-3 min-w-0">
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs border border-black/10 dark:border-white/10 overflow-hidden"
-            style={{ backgroundColor: task.color || '#8E7CC3' }}
-          >
-            <IconRenderer name={task.iconName} className="w-5 h-5" size={20} />
-          </div>
+          <IconBadge
+            name={task.iconName}
+            color={task.color || '#8E7CC3'}
+            alt={task.title}
+          />
 
           <div className="min-w-0">
             <h4

@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Habit, Task, TimeBlock } from '../../types';
 import { TimeBlockModal } from './TimeBlockModal';
-import { IconRenderer } from '../common/IconRenderer';
+import { IconRenderer, IconBadge } from '../common/IconRenderer';
 import { SwipeToComplete } from '../common/SwipeToComplete';
 import { getTodayKey, formatDatePretty } from '../../utils/date';
 import { Plus, Calendar, Clock, Sparkles, Check, Play, BookOpen, Layers } from 'lucide-react';
@@ -244,12 +244,11 @@ export const ScheduleTimeline: React.FC<ScheduleTimelineProps> = ({
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     {/* Left info */}
                     <div className="flex items-start gap-3 min-w-0">
-                      <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs border border-black/10"
-                        style={{ backgroundColor: item.color }}
-                      >
-                        <IconRenderer name={item.iconName} className="w-5 h-5" />
-                      </div>
+                      <IconBadge
+                        name={item.iconName}
+                        color={item.color}
+                        alt={item.title}
+                      />
 
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">

@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import {
   IconRenderer,
+  IconBadge,
+  isImageIcon,
   ICON_CATEGORIES,
   POPULAR_EMOJIS,
 } from './IconRenderer';
@@ -111,11 +113,7 @@ export const IconAndColorCustomizer: React.FC<IconAndColorCustomizerProps> = ({
     reader.readAsDataURL(file);
   };
 
-  const isCustomUploadedImage =
-    iconName.startsWith('data:image') ||
-    iconName.startsWith('http://') ||
-    iconName.startsWith('https://') ||
-    iconName.startsWith('blob:');
+  const isCustomUploadedImage = isImageIcon(iconName);
 
   // Filter icons by category or search
   const currentCategoryObj = ICON_CATEGORIES.find((c) => c.category === selectedCategory);
@@ -144,13 +142,12 @@ export const IconAndColorCustomizer: React.FC<IconAndColorCustomizerProps> = ({
 
         {/* Live Preview Stamp */}
         <div className="flex items-center gap-2 shrink-0">
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center shadow-xs border-2 border-white/60 dark:border-black/30 overflow-hidden text-white transition-all transform hover:scale-105"
-            style={{ backgroundColor: color }}
-            title="Current Icon & Color Preview"
-          >
-            <IconRenderer name={iconName} className="w-5 h-5" size={20} />
-          </div>
+          <IconBadge
+            name={iconName}
+            color={color}
+            size="md"
+            alt="Current Icon & Color Preview"
+          />
         </div>
       </div>
 

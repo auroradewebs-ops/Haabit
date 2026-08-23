@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BujoImageLayout, Task } from '../../types';
 import { Modal } from '../common/Modal';
 import { BUJO_STICKER_PRESETS, BujoStickerPreset } from '../../utils/bujoPresets';
+import { ImageSizeAndFocusAdjuster } from '../common/ImageSizeAndFocusAdjuster';
 import {
   Image,
   Upload,
@@ -14,6 +15,7 @@ import {
   Camera,
   Layers,
   FileImage,
+  Target,
 } from 'lucide-react';
 
 interface BujoDecorationPickerModalProps {
@@ -22,10 +24,20 @@ interface BujoDecorationPickerModalProps {
   currentImageUrl?: string;
   currentImageLayout?: BujoImageLayout;
   currentCaption?: string;
+  currentImageSize?: 'sm' | 'md' | 'lg' | 'xl';
+  currentImageZoom?: number;
+  currentImageFocusX?: number;
+  currentImageFocusY?: number;
+  currentImageFit?: 'cover' | 'contain';
   onSaveDecoration: (decoration: {
     imageUrl?: string;
     imageLayout?: BujoImageLayout;
     imageCaption?: string;
+    imageSize?: 'sm' | 'md' | 'lg' | 'xl';
+    imageZoom?: number;
+    imageFocusX?: number;
+    imageFocusY?: number;
+    imageFit?: 'cover' | 'contain';
   }) => void;
 }
 
@@ -35,6 +47,11 @@ export const BujoDecorationPickerModal: React.FC<BujoDecorationPickerModalProps>
   currentImageUrl = '',
   currentImageLayout = 'polaroid',
   currentCaption = '',
+  currentImageSize = 'md',
+  currentImageZoom = 100,
+  currentImageFocusX = 50,
+  currentImageFocusY = 50,
+  currentImageFit = 'cover',
   onSaveDecoration,
 }) => {
   const [activeTab, setActiveTab] = useState<'presets' | 'upload' | 'url'>('presets');
@@ -42,8 +59,39 @@ export const BujoDecorationPickerModal: React.FC<BujoDecorationPickerModalProps>
   const [imageUrl, setImageUrl] = useState<string>(currentImageUrl);
   const [imageLayout, setImageLayout] = useState<BujoImageLayout>(currentImageLayout || 'polaroid');
   const [caption, setCaption] = useState<string>(currentCaption || '');
+  const [imageSize, setImageSize] = useState<'sm' | 'md' | 'lg' | 'xl'>(currentImageSize || 'md');
+  const [imageZoom, setImageZoom] = useState<number>(currentImageZoom ?? 100);
+  const [imageFocusX, setImageFocusX] = useState<number>(currentImageFocusX ?? 50);
+  const [imageFocusY, setImageFocusY] = useState<number>(currentImageFocusY ?? 50);
+  const [imageFit, setImageFit] = useState<'cover' | 'contain'>(currentImageFit || 'cover');
+
   const [urlInput, setUrlInput] = useState<string>(currentImageUrl.startsWith('http') ? currentImageUrl : '');
   const [uploadError, setUploadError] = useState<string | null>(null);
+
+  // Sync props when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setImageUrl(currentImageUrl);
+      setImageLayout(currentImageLayout || 'polaroid');
+      setCaption(currentCaption || '');
+      setImageSize(currentImageSize || 'md');
+      setImageZoom(currentImageZoom ?? 100);
+      setImageFocusX(currentImageFocusX ?? 50);
+      setImageFocusY(currentImageFocusY ?? 50);
+      setImageFit(currentImageFit || 'cover');
+      setUrlInput(currentImageUrl.startsWith('http') ? currentImageUrl : '');
+    }
+  }, [
+    isOpen,
+    currentImageUrl,
+    currentImageLayout,
+    currentCaption,
+    currentImageSize,
+    currentImageZoom,
+    currentImageFocusX,
+    currentImageFocusY,
+    currentImageFit,
+  ]);
 
   // Filter presets
   const filteredPresets = BUJO_STICKER_PRESETS.filter((p) =>
@@ -57,12 +105,12 @@ export const BujoDecorationPickerModal: React.FC<BujoDecorationPickerModalProps>
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      setUploadError('Por favor selecciona un archivo de imagen válido (JPG, PNG, WebP).');
+      setUploadError('Please select a valid image file (JPG, PNG, WebP).');
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      setUploadError('La imagen es demasiado grande (máximo 5MB).');
+      setUploadError('Image size is too large (max 5MB).');
       return;
     }
 
@@ -73,7 +121,7 @@ export const BujoDecorationPickerModal: React.FC<BujoDecorationPickerModalProps>
       }
     };
     reader.onerror = () => {
-      setUploadError('Error al leer el archivo de imagen.');
+      setUploadError('Error reading image file.');
     };
     reader.readAsDataURL(file);
   };
@@ -97,6 +145,11 @@ export const BujoDecorationPickerModal: React.FC<BujoDecorationPickerModalProps>
       imageUrl: imageUrl.trim() || undefined,
       imageLayout: imageUrl.trim() ? imageLayout : undefined,
       imageCaption: imageUrl.trim() ? caption.trim() : undefined,
+      imageSize: imageUrl.trim() ? imageSize : undefined,
+      imageZoom: imageUrl.trim() ? imageZoom : undefined,
+      imageFocusX: imageUrl.trim() ? imageFocusX : undefined,
+      imageFocusY: imageUrl.trim() ? imageFocusY : undefined,
+      imageFit: imageUrl.trim() ? imageFit : undefined,
     });
     onClose();
   };
@@ -108,6 +161,11 @@ export const BujoDecorationPickerModal: React.FC<BujoDecorationPickerModalProps>
       imageUrl: undefined,
       imageLayout: undefined,
       imageCaption: undefined,
+      imageSize: undefined,
+      imageZoom: undefined,
+      imageFocusX: undefined,
+      imageFocusY: undefined,
+      imageFit: undefined,
     });
     onClose();
   };
@@ -116,24 +174,24 @@ export const BujoDecorationPickerModal: React.FC<BujoDecorationPickerModalProps>
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Decoración & Stickers BuJo"
-      subtitle="Añade fotos polaroid, sellos vintage, tiras washi tape y stickers a tus entradas"
+      title="Decoration, Photo Size & Focus Framing"
+      subtitle="Attach photos, polaroids, stamps, and adjust size, zoom, and focal point"
       maxWidth="max-w-2xl"
     >
-      <div className="space-y-5">
+      <div className="space-y-5 max-h-[78vh] overflow-y-auto pr-1">
         {/* Navigation Tabs */}
-        <div className="flex items-center gap-1.5 p-1 bg-stone-100 rounded-2xl border border-stone-200">
+        <div className="flex items-center gap-1.5 p-1 bg-stone-100 dark:bg-[#1A1C2B] rounded-2xl border border-stone-200 dark:border-[#3C4263]">
           <button
             type="button"
             onClick={() => setActiveTab('presets')}
             className={`flex-1 py-2 rounded-xl text-xs font-bold font-body transition-all flex items-center justify-center gap-1.5 ${
               activeTab === 'presets'
-                ? 'bg-white text-[#2B4789] shadow-xs'
-                : 'text-stone-600 hover:text-stone-900'
+                ? 'bg-white dark:bg-[#282C44] text-[#8E7CC3] shadow-xs'
+                : 'text-stone-600 dark:text-stone-400 hover:text-stone-900'
             }`}
           >
             <Sparkles className="w-3.5 h-3.5 text-[#E36D9B]" />
-            <span>Galería de Stickers & Fotos</span>
+            <span>Preset Gallery</span>
           </button>
 
           <button
@@ -141,12 +199,12 @@ export const BujoDecorationPickerModal: React.FC<BujoDecorationPickerModalProps>
             onClick={() => setActiveTab('upload')}
             className={`flex-1 py-2 rounded-xl text-xs font-bold font-body transition-all flex items-center justify-center gap-1.5 ${
               activeTab === 'upload'
-                ? 'bg-white text-[#2B4789] shadow-xs'
-                : 'text-stone-600 hover:text-stone-900'
+                ? 'bg-white dark:bg-[#282C44] text-[#8E7CC3] shadow-xs'
+                : 'text-stone-600 dark:text-stone-400 hover:text-stone-900'
             }`}
           >
             <Upload className="w-3.5 h-3.5 text-[#10B183]" />
-            <span>Subir desde mi Dispositivo</span>
+            <span>Upload Device Image</span>
           </button>
 
           <button
@@ -154,12 +212,12 @@ export const BujoDecorationPickerModal: React.FC<BujoDecorationPickerModalProps>
             onClick={() => setActiveTab('url')}
             className={`flex-1 py-2 rounded-xl text-xs font-bold font-body transition-all flex items-center justify-center gap-1.5 ${
               activeTab === 'url'
-                ? 'bg-white text-[#2B4789] shadow-xs'
-                : 'text-stone-600 hover:text-stone-900'
+                ? 'bg-white dark:bg-[#282C44] text-[#8E7CC3] shadow-xs'
+                : 'text-stone-600 dark:text-stone-400 hover:text-stone-900'
             }`}
           >
             <Link className="w-3.5 h-3.5 text-[#E7DD6A]" />
-            <span>Enlace / URL Externa</span>
+            <span>Image Web URL</span>
           </button>
         </div>
 
@@ -169,12 +227,12 @@ export const BujoDecorationPickerModal: React.FC<BujoDecorationPickerModalProps>
             {/* Category pills */}
             <div className="flex items-center gap-1 overflow-x-auto pb-1">
               {[
-                { id: 'all', label: 'Todos' },
+                { id: 'all', label: 'All Presets' },
                 { id: 'washi', label: 'Washi Tapes' },
-                { id: 'vintage', label: 'Sellos & Vintage' },
-                { id: 'cozy', label: 'Cozy & Café' },
-                { id: 'botanical', label: 'Botánica' },
-                { id: 'focus', label: 'Enfoque & Metas' },
+                { id: 'vintage', label: 'Stamps & Vintage' },
+                { id: 'cozy', label: 'Cozy & Coffee' },
+                { id: 'botanical', label: 'Botanical' },
+                { id: 'focus', label: 'Focus & Rituals' },
               ].map((cat) => (
                 <button
                   key={cat.id}
@@ -182,8 +240,8 @@ export const BujoDecorationPickerModal: React.FC<BujoDecorationPickerModalProps>
                   onClick={() => setSelectedCategory(cat.id)}
                   className={`px-3 py-1 rounded-xl text-xs font-semibold whitespace-nowrap font-body transition-all ${
                     selectedCategory === cat.id
-                      ? 'bg-[#2B4789] text-white shadow-2xs'
-                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                      ? 'bg-[#8E7CC3] text-white shadow-2xs'
+                      : 'bg-stone-100 dark:bg-[#23273C] text-stone-600 dark:text-stone-300 hover:bg-stone-200'
                   }`}
                 >
                   {cat.label}
@@ -192,7 +250,7 @@ export const BujoDecorationPickerModal: React.FC<BujoDecorationPickerModalProps>
             </div>
 
             {/* Grid of presets */}
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 max-h-56 overflow-y-auto pr-1">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 max-h-52 overflow-y-auto pr-1">
               {filteredPresets.map((preset) => (
                 <button
                   key={preset.id}
@@ -200,25 +258,25 @@ export const BujoDecorationPickerModal: React.FC<BujoDecorationPickerModalProps>
                   onClick={() => handleSelectPreset(preset)}
                   className={`group relative rounded-xl border p-1.5 text-left transition-all overflow-hidden ${
                     imageUrl === preset.url
-                      ? 'border-[#2B4789] ring-2 ring-[#2B4789] bg-blue-50/50'
-                      : 'border-stone-200 hover:border-stone-400 bg-white'
+                      ? 'border-[#8E7CC3] ring-2 ring-[#8E7CC3] bg-[#8E7CC3]/10'
+                      : 'border-stone-200 dark:border-[#3C4263] hover:border-stone-400 bg-white dark:bg-[#23273C]'
                   }`}
                 >
-                  <div className="w-full h-20 rounded-lg overflow-hidden bg-stone-100 mb-1.5 relative">
+                  <div className="w-full h-18 rounded-lg overflow-hidden bg-stone-100 dark:bg-stone-800 mb-1.5 relative">
                     <img
                       src={preset.url}
                       alt={preset.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                     />
                     {imageUrl === preset.url && (
-                      <div className="absolute inset-0 bg-[#2B4789]/30 flex items-center justify-center">
-                        <div className="w-5 h-5 rounded-full bg-[#2B4789] text-white flex items-center justify-center">
+                      <div className="absolute inset-0 bg-[#8E7CC3]/40 flex items-center justify-center">
+                        <div className="w-5 h-5 rounded-full bg-white text-[#8E7CC3] flex items-center justify-center">
                           <Check className="w-3.5 h-3.5 stroke-[3]" />
                         </div>
                       </div>
                     )}
                   </div>
-                  <span className="text-[10px] font-bold font-body text-stone-800 line-clamp-1 block">
+                  <span className="text-[10px] font-bold font-body text-stone-800 dark:text-stone-200 line-clamp-1 block">
                     {preset.name}
                   </span>
                   <span className="text-[9px] uppercase font-mono text-stone-500 font-semibold">
@@ -233,16 +291,16 @@ export const BujoDecorationPickerModal: React.FC<BujoDecorationPickerModalProps>
         {/* Tab 2: Upload File */}
         {activeTab === 'upload' && (
           <div className="space-y-3">
-            <div className="border-2 border-dashed border-stone-300 hover:border-[#2B4789] rounded-2xl p-6 text-center bg-stone-50/50 transition-colors">
+            <div className="border-2 border-dashed border-stone-300 dark:border-[#3C4263] hover:border-[#8E7CC3] rounded-2xl p-6 text-center bg-stone-50/50 dark:bg-[#1A1C2B] transition-colors">
               <label className="cursor-pointer flex flex-col items-center justify-center gap-2">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-[#10B183] flex items-center justify-center">
+                <div className="w-12 h-12 rounded-2xl bg-[#8E7CC3]/15 text-[#8E7CC3] flex items-center justify-center">
                   <Upload className="w-6 h-6" />
                 </div>
-                <span className="text-xs font-bold font-body text-stone-800">
-                  Selecciona una imagen de tu galería o dispositivo
+                <span className="text-xs font-bold font-body text-stone-800 dark:text-stone-200">
+                  Select a photo from your gallery or computer
                 </span>
                 <span className="text-[11px] text-stone-500 font-body">
-                  Soporta JPG, PNG, WebP o GIF (máx. 5MB)
+                  Supports JPG, PNG, WebP or GIF (max 5MB)
                 </span>
                 <input
                   type="file"
@@ -250,8 +308,8 @@ export const BujoDecorationPickerModal: React.FC<BujoDecorationPickerModalProps>
                   onChange={handleFileUpload}
                   className="hidden"
                 />
-                <span className="mt-2 px-4 py-2 bg-stone-900 text-white rounded-xl text-xs font-bold font-body hover:bg-stone-800">
-                  Explorar Archivos
+                <span className="mt-2 px-4 py-2 bg-[#8E7CC3] text-white rounded-xl text-xs font-bold font-body hover:bg-[#7B68B4]">
+                  Browse Files
                 </span>
               </label>
             </div>
@@ -266,8 +324,8 @@ export const BujoDecorationPickerModal: React.FC<BujoDecorationPickerModalProps>
         {/* Tab 3: URL */}
         {activeTab === 'url' && (
           <div className="space-y-3">
-            <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 font-body">
-              URL de Imagen Externa (Unsplash, Pinterest, etc.)
+            <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300 font-body">
+              External Image URL
             </label>
             <div className="flex gap-2">
               <input
@@ -275,88 +333,105 @@ export const BujoDecorationPickerModal: React.FC<BujoDecorationPickerModalProps>
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
                 placeholder="https://images.unsplash.com/..."
-                className="flex-1 px-3 py-2 text-xs font-body rounded-xl border border-stone-200 focus:outline-none focus:border-[#2B4789]"
+                className="flex-1 px-3 py-2 text-xs font-body rounded-xl border border-stone-200 dark:border-[#3C4263] bg-white dark:bg-[#161825] focus:outline-none focus:border-[#8E7CC3]"
               />
               <button
                 type="button"
                 onClick={handleApplyUrl}
-                className="px-4 py-2 bg-[#2B4789] text-white text-xs font-bold font-body rounded-xl hover:bg-[#1E3264]"
+                className="px-4 py-2 bg-[#8E7CC3] text-white text-xs font-bold font-body rounded-xl hover:bg-[#7B68B4]"
               >
-                Cargar
+                Load
               </button>
             </div>
           </div>
         )}
 
-        {/* Live Preview & Style Config (If an image is selected) */}
+        {/* Live Preview, Style, Caption & Size/Focus Controls (When image is present) */}
         {imageUrl && (
-          <div className="p-4 rounded-2xl bg-amber-50/40 border-2 border-amber-200/80 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-stone-800 font-body flex items-center gap-1.5">
-                <Camera className="w-3.5 h-3.5 text-[#2B4789]" /> Estilo de Montaje Analógico
-              </span>
-              <button
-                type="button"
-                onClick={() => setImageUrl('')}
-                className="text-[11px] font-body text-rose-600 hover:underline flex items-center gap-1"
-              >
-                <Trash2 className="w-3 h-3" /> Quitar imagen
-              </button>
-            </div>
-
-            {/* Layout selector */}
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-              {[
-                { id: 'polaroid', label: 'Polaroid', desc: 'Marco blanco con cinta' },
-                { id: 'stamp', label: 'Sello Postal', desc: 'Bordes troquelados' },
-                { id: 'washi', label: 'Washi Tape', desc: 'Banda horizontal' },
-                { id: 'sticker', label: 'Sticker', desc: 'Recorte flotante' },
-                { id: 'banner', label: 'Banner Top', desc: 'Cabecera superior' },
-              ].map((l) => (
+          <div className="space-y-4">
+            <div className="p-4 rounded-2xl bg-amber-50/40 dark:bg-[#1E2235] border-2 border-amber-200/80 dark:border-[#3C4263] space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-wider text-stone-800 dark:text-stone-200 font-body flex items-center gap-1.5">
+                  <Camera className="w-3.5 h-3.5 text-[#8E7CC3]" /> Mounting Style & Frame
+                </span>
                 <button
-                  key={l.id}
                   type="button"
-                  onClick={() => setImageLayout(l.id as BujoImageLayout)}
-                  className={`p-2 rounded-xl border text-center transition-all ${
-                    imageLayout === l.id
-                      ? 'border-[#2B4789] bg-[#2B4789] text-white font-bold shadow-xs'
-                      : 'border-stone-200 bg-white text-stone-700 hover:bg-stone-100'
-                  }`}
+                  onClick={() => setImageUrl('')}
+                  className="text-[11px] font-body text-rose-600 hover:underline flex items-center gap-1"
                 >
-                  <span className="text-xs block font-body">{l.label}</span>
-                  <span className={`text-[10px] block ${imageLayout === l.id ? 'text-white/80' : 'text-stone-400'}`}>
-                    {l.desc}
-                  </span>
+                  <Trash2 className="w-3 h-3" /> Remove image
                 </button>
-              ))}
+              </div>
+
+              {/* Layout selector */}
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                {[
+                  { id: 'polaroid', label: 'Polaroid', desc: 'White frame with tape' },
+                  { id: 'stamp', label: 'Postage Stamp', desc: 'Serrated edges' },
+                  { id: 'washi', label: 'Washi Strip', desc: 'Horizontal banner' },
+                  { id: 'sticker', label: 'Sticker', desc: 'Floating cutout' },
+                  { id: 'banner', label: 'Banner Top', desc: 'Header spread' },
+                ].map((l) => (
+                  <button
+                    key={l.id}
+                    type="button"
+                    onClick={() => setImageLayout(l.id as BujoImageLayout)}
+                    className={`p-2 rounded-xl border text-center transition-all ${
+                      imageLayout === l.id
+                        ? 'border-[#8E7CC3] bg-[#8E7CC3] text-white font-bold shadow-xs'
+                        : 'border-stone-200 dark:border-[#3C4263] bg-white dark:bg-[#282C44] text-stone-700 dark:text-stone-300 hover:bg-stone-100'
+                    }`}
+                  >
+                    <span className="text-xs block font-body">{l.label}</span>
+                    <span className={`text-[10px] block ${imageLayout === l.id ? 'text-white/80' : 'text-stone-400'}`}>
+                      {l.desc}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Caption Input */}
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-600 dark:text-stone-400 mb-1 font-body">
+                  Caption or Calligraphy Note (optional)
+                </label>
+                <input
+                  type="text"
+                  value={caption}
+                  onChange={(e) => setCaption(e.target.value)}
+                  placeholder="e.g., Summer memories and quiet focus..."
+                  className="w-full px-3 py-1.5 text-xs font-body rounded-xl border border-stone-200 dark:border-[#3C4263] bg-white dark:bg-[#161825] focus:outline-none focus:border-[#8E7CC3]"
+                />
+              </div>
             </div>
 
-            {/* Caption Input */}
-            <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-600 mb-1 font-body">
-                Pie de foto o anotación caligráfica (opcional)
-              </label>
-              <input
-                type="text"
-                value={caption}
-                onChange={(e) => setCaption(e.target.value)}
-                placeholder="Ej: Momento de inspiración matutina..."
-                className="w-full px-3 py-1.5 text-xs font-body rounded-xl border border-stone-200 bg-white focus:outline-none focus:border-[#2B4789]"
-              />
-            </div>
+            {/* Reusable Size & Focal Point Adjuster */}
+            <ImageSizeAndFocusAdjuster
+              size={imageSize}
+              onChangeSize={setImageSize}
+              zoom={imageZoom}
+              onChangeZoom={setImageZoom}
+              focusX={imageFocusX}
+              onChangeFocusX={setImageFocusX}
+              focusY={imageFocusY}
+              onChangeFocusY={setImageFocusY}
+              fit={imageFit}
+              onChangeFit={setImageFit}
+              previewUrl={imageUrl}
+            />
           </div>
         )}
 
         {/* Action Buttons */}
-        <div className="pt-2 flex items-center justify-between">
+        <div className="pt-2 flex items-center justify-between border-t border-stone-200 dark:border-[#3C4263]">
           {currentImageUrl ? (
             <button
               type="button"
               onClick={handleRemove}
-              className="px-4 py-2 rounded-xl text-rose-600 hover:bg-rose-50 text-xs font-bold font-body transition-all flex items-center gap-1.5"
+              className="px-4 py-2 rounded-xl text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs font-bold font-body transition-all flex items-center gap-1.5"
             >
               <Trash2 className="w-3.5 h-3.5" />
-              <span>Eliminar Decoración</span>
+              <span>Remove Photo</span>
             </button>
           ) : (
             <div />
@@ -366,16 +441,16 @@ export const BujoDecorationPickerModal: React.FC<BujoDecorationPickerModalProps>
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl border border-stone-200 text-stone-600 text-xs font-semibold font-body hover:bg-stone-100"
+              className="px-4 py-2 rounded-xl border border-stone-200 dark:border-[#3C4263] text-stone-600 dark:text-stone-400 text-xs font-semibold font-body hover:bg-stone-100"
             >
-              Cancelar
+              Cancel
             </button>
             <button
               type="button"
               onClick={handleSave}
-              className="px-6 py-2 rounded-xl bg-[#2B4789] hover:bg-[#1E3264] text-white text-xs font-bold font-body shadow-sm active:scale-95 transition-all"
+              className="px-6 py-2 rounded-xl bg-[#8E7CC3] hover:bg-[#7B68B4] text-white text-xs font-bold font-body shadow-sm active:scale-95 transition-all"
             >
-              Guardar en la Entrada
+              Save Decoration
             </button>
           </div>
         </div>

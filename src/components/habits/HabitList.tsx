@@ -199,19 +199,44 @@ export const HabitList: React.FC<HabitListProps> = ({
               <div
                 onClick={() => setIsDecorationModalOpen(true)}
                 className="relative group cursor-pointer shrink-0 self-center sm:self-auto transition-transform hover:scale-105 active:scale-95 my-1 sm:my-0"
-                title="Click to customize habit decoration & photo"
+                title="Click to customize habit decoration, photo size, and focus"
               >
                 {/* Polaroid Layout */}
                 {(!decoration.layout || decoration.layout === 'polaroid') && (
-                  <div className="relative bg-white dark:bg-[#282C44] p-2 sm:p-1.5 pb-2.5 sm:pb-2 rounded-2xl sm:rounded-xl shadow-md border-2 border-[#D7C9B1] dark:border-[#3C4263] w-36 sm:w-28 md:w-32 transform sm:rotate-2">
+                  <div
+                    className={`relative bg-white dark:bg-[#282C44] p-2 sm:p-1.5 pb-2.5 sm:pb-2 rounded-2xl sm:rounded-xl shadow-md border-2 border-[#D7C9B1] dark:border-[#3C4263] transform sm:rotate-2 transition-all ${
+                      decoration.size === 'sm'
+                        ? 'w-28 sm:w-24 md:w-28'
+                        : decoration.size === 'lg'
+                        ? 'w-44 sm:w-36 md:w-40'
+                        : decoration.size === 'xl'
+                        ? 'w-52 sm:w-44 md:w-48'
+                        : 'w-36 sm:w-28 md:w-32'
+                    }`}
+                  >
                     {/* Washi Tape Strip */}
-                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-14 sm:w-10 h-4 sm:h-3.5 bg-[#FF8E7E]/40 dark:bg-[#FF8E7E]/50 rounded-xs shadow-2xs -rotate-1 pointer-events-none" />
+                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-12 sm:w-10 h-4 sm:h-3.5 bg-[#FF8E7E]/40 dark:bg-[#FF8E7E]/50 rounded-xs shadow-2xs -rotate-1 pointer-events-none" />
                     
-                    <div className="w-full h-28 sm:h-20 md:h-22 rounded-xl sm:rounded-lg overflow-hidden bg-stone-100 dark:bg-stone-800">
+                    <div
+                      className={`w-full rounded-xl sm:rounded-lg overflow-hidden bg-stone-100 dark:bg-stone-800 relative transition-all ${
+                        decoration.size === 'sm'
+                          ? 'h-20 sm:h-16 md:h-18'
+                          : decoration.size === 'lg'
+                          ? 'h-36 sm:h-28 md:h-32'
+                          : decoration.size === 'xl'
+                          ? 'h-44 sm:h-36 md:h-40'
+                          : 'h-28 sm:h-20 md:h-22'
+                      }`}
+                    >
                       <img
                         src={decoration.imageUrl}
                         alt={decoration.imageCaption || 'Decoration'}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full"
+                        style={{
+                          objectFit: decoration.fit || 'cover',
+                          objectPosition: `${decoration.focusX ?? 50}% ${decoration.focusY ?? 50}%`,
+                          transform: `scale(${(decoration.zoom ?? 100) / 100})`,
+                        }}
                       />
                     </div>
                     <div className="text-xs sm:text-[10px] font-display italic font-semibold text-center text-[#4A3222] dark:text-[#E2E8F0] truncate mt-1.5 sm:mt-1 px-1 sm:px-0.5">
@@ -227,11 +252,26 @@ export const HabitList: React.FC<HabitListProps> = ({
 
                 {/* Framed Layout */}
                 {decoration.layout === 'frame' && (
-                  <div className="relative w-32 h-32 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden border-2 border-[#8E7CC3] shadow-md bg-white dark:bg-[#282C44] p-1">
+                  <div
+                    className={`relative rounded-2xl overflow-hidden border-2 border-[#8E7CC3] shadow-md bg-white dark:bg-[#282C44] p-1 transition-all ${
+                      decoration.size === 'sm'
+                        ? 'w-24 h-24 sm:w-20 sm:h-20 md:w-24 md:h-24'
+                        : decoration.size === 'lg'
+                        ? 'w-40 h-40 sm:w-32 sm:h-32 md:w-36 md:h-36'
+                        : decoration.size === 'xl'
+                        ? 'w-48 h-48 sm:w-40 sm:h-40 md:w-44 md:h-44'
+                        : 'w-32 h-32 sm:w-24 sm:h-24 md:w-28 md:h-28'
+                    }`}
+                  >
                     <img
                       src={decoration.imageUrl}
                       alt={decoration.imageCaption || 'Decoration'}
-                      className="w-full h-full object-cover rounded-xl"
+                      className="w-full h-full rounded-xl"
+                      style={{
+                        objectFit: decoration.fit || 'cover',
+                        objectPosition: `${decoration.focusX ?? 50}% ${decoration.focusY ?? 50}%`,
+                        transform: `scale(${(decoration.zoom ?? 100) / 100})`,
+                      }}
                     />
                     <div className="absolute inset-0 bg-black/30 rounded-2xl opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                       <Camera className="w-5 h-5 sm:w-4 sm:h-4 text-white drop-shadow" />
@@ -241,11 +281,26 @@ export const HabitList: React.FC<HabitListProps> = ({
 
                 {/* Sticker Layout */}
                 {decoration.layout === 'sticker' && (
-                  <div className="relative w-32 h-32 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden p-1.5 sm:p-1 bg-white dark:bg-[#282C44] shadow-md border-2 border-dashed border-[#8E7CC3] transform -rotate-1 sm:-rotate-2">
+                  <div
+                    className={`relative rounded-2xl overflow-hidden p-1.5 sm:p-1 bg-white dark:bg-[#282C44] shadow-md border-2 border-dashed border-[#8E7CC3] transform -rotate-1 sm:-rotate-2 transition-all ${
+                      decoration.size === 'sm'
+                        ? 'w-24 h-24 sm:w-20 sm:h-20 md:w-24 md:h-24'
+                        : decoration.size === 'lg'
+                        ? 'w-40 h-40 sm:w-32 sm:h-32 md:w-36 md:h-36'
+                        : decoration.size === 'xl'
+                        ? 'w-48 h-48 sm:w-40 sm:h-40 md:w-44 md:h-44'
+                        : 'w-32 h-32 sm:w-24 sm:h-24 md:w-28 md:h-28'
+                    }`}
+                  >
                     <img
                       src={decoration.imageUrl}
                       alt={decoration.imageCaption || 'Decoration'}
                       className="w-full h-full object-cover rounded-xl"
+                      style={{
+                        objectFit: decoration.fit || 'cover',
+                        objectPosition: `${decoration.focusX ?? 50}% ${decoration.focusY ?? 50}%`,
+                        transform: `scale(${(decoration.zoom ?? 100) / 100})`,
+                      }}
                     />
                     <div className="absolute inset-0 bg-black/30 rounded-2xl opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                       <Camera className="w-5 h-5 sm:w-4 sm:h-4 text-white drop-shadow" />

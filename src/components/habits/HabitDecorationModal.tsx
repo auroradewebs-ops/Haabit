@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Modal } from '../common/Modal';
 import {
   HabitBannerDecoration,
@@ -6,6 +6,7 @@ import {
   COZY_PRESET_DECORATIONS,
   compressImageFile,
 } from '../../utils/storage';
+import { ImageSizeAndFocusAdjuster } from '../common/ImageSizeAndFocusAdjuster';
 import {
   Upload,
   Image as ImageIcon,
@@ -17,6 +18,8 @@ import {
   Heart,
   Camera,
   Layers,
+  Sliders,
+  Target,
 } from 'lucide-react';
 
 interface HabitDecorationModalProps {
@@ -38,18 +41,31 @@ export const HabitDecorationModal: React.FC<HabitDecorationModalProps> = ({
   const [layout, setLayout] = useState<'polaroid' | 'sticker' | 'frame'>(
     currentDecoration.layout || 'polaroid'
   );
+  const [size, setSize] = useState<'sm' | 'md' | 'lg' | 'xl'>(
+    currentDecoration.size || 'md'
+  );
+  const [zoom, setZoom] = useState<number>(currentDecoration.zoom ?? 100);
+  const [focusX, setFocusX] = useState<number>(currentDecoration.focusX ?? 50);
+  const [focusY, setFocusY] = useState<number>(currentDecoration.focusY ?? 50);
+  const [fit, setFit] = useState<'cover' | 'contain'>(currentDecoration.fit || 'cover');
+
   const [isProcessingFile, setIsProcessingFile] = useState(false);
   const [activePhotoSource, setActivePhotoSource] = useState<'upload' | 'presets'>('upload');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Sync initial values when opened
-  React.useEffect(() => {
+  useEffect(() => {
     if (isOpen) {
       setPhrase(currentDecoration.phrase);
       setImageUrl(currentDecoration.imageUrl);
       setImageCaption(currentDecoration.imageCaption || 'Cozy Rituals 🌿');
       setLayout(currentDecoration.layout || 'polaroid');
+      setSize(currentDecoration.size || 'md');
+      setZoom(currentDecoration.zoom ?? 100);
+      setFocusX(currentDecoration.focusX ?? 50);
+      setFocusY(currentDecoration.focusY ?? 50);
+      setFit(currentDecoration.fit || 'cover');
     }
   }, [isOpen, currentDecoration]);
 
@@ -64,7 +80,7 @@ export const HabitDecorationModal: React.FC<HabitDecorationModalProps> = ({
 
     try {
       setIsProcessingFile(true);
-      const compressedDataUrl = await compressImageFile(file, 600, 600, 0.82);
+      const compressedDataUrl = await compressImageFile(file, 700, 700, 0.85);
       setImageUrl(compressedDataUrl);
       if (!imageCaption) {
         setImageCaption('My Cozy Habit 🌸');
@@ -74,7 +90,6 @@ export const HabitDecorationModal: React.FC<HabitDecorationModalProps> = ({
       alert('Unable to load the selected image. Please try another file.');
     } finally {
       setIsProcessingFile(false);
-      // Reset input value so same file can be re-selected if needed
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -104,6 +119,11 @@ export const HabitDecorationModal: React.FC<HabitDecorationModalProps> = ({
       imageUrl,
       imageCaption: imageCaption.trim() || 'Cozy Rituals 🌿',
       layout,
+      size,
+      zoom,
+      focusX,
+      focusY,
+      fit,
     });
     onClose();
   };
@@ -113,6 +133,11 @@ export const HabitDecorationModal: React.FC<HabitDecorationModalProps> = ({
     setImageUrl(null);
     setImageCaption('Cozy Rituals 🌿');
     setLayout('polaroid');
+    setSize('md');
+    setZoom(100);
+    setFocusX(50);
+    setFocusY(50);
+    setFit('cover');
   };
 
   return (
@@ -121,9 +146,9 @@ export const HabitDecorationModal: React.FC<HabitDecorationModalProps> = ({
       onClose={onClose}
       title="Decorate Rituals Space"
       subtitle="Personalize your daily habits with a motivational phrase and a cozy photo from your device"
-      maxWidth="max-w-xl"
+      maxWidth="max-w-2xl"
     >
-      <div className="space-y-6 pt-2">
+      <div className="space-y-6 pt-1 max-h-[78vh] overflow-y-auto pr-1">
         {/* ========================================================================= */}
         {/* 1. MOTIVATIONAL PHRASE SECTION */}
         {/* ========================================================================= */}
@@ -187,7 +212,7 @@ export const HabitDecorationModal: React.FC<HabitDecorationModalProps> = ({
         {/* ========================================================================= */}
         {/* 2. DECORATIVE IMAGE SECTION */}
         {/* ========================================================================= */}
-        <div className="space-y-3">
+        <div className="space-y-3.5">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold uppercase tracking-wider text-[#735A46] dark:text-[#94A3B8] font-body flex items-center gap-1.5">
               <Camera className="w-3.5 h-3.5 text-[#E27B9B]" />
@@ -248,9 +273,9 @@ export const HabitDecorationModal: React.FC<HabitDecorationModalProps> = ({
 
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-[#D7C9B1] dark:border-[#3C4263] hover:border-[#8E7CC3] dark:hover:border-[#8E7CC3] bg-[#FAF6EE]/70 dark:bg-[#1A1C2B] rounded-2xl p-5 text-center cursor-pointer transition-all hover:bg-[#FAF6EE] group"
+                className="border-2 border-dashed border-[#D7C9B1] dark:border-[#3C4263] hover:border-[#8E7CC3] dark:hover:border-[#8E7CC3] bg-[#FAF6EE]/70 dark:bg-[#1A1C2B] rounded-2xl p-4 text-center cursor-pointer transition-all hover:bg-[#FAF6EE] group"
               >
-                <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#23273C] text-[#8E7CC3] flex items-center justify-center mx-auto mb-2 border border-[#D7C9B1] dark:border-[#3C4263] group-hover:scale-105 transition-transform shadow-2xs">
+                <div className="w-9 h-9 rounded-xl bg-white dark:bg-[#23273C] text-[#8E7CC3] flex items-center justify-center mx-auto mb-2 border border-[#D7C9B1] dark:border-[#3C4263] group-hover:scale-105 transition-transform shadow-2xs">
                   {isProcessingFile ? (
                     <div className="w-5 h-5 border-2 border-[#8E7CC3] border-t-transparent rounded-full animate-spin" />
                   ) : (
@@ -300,105 +325,139 @@ export const HabitDecorationModal: React.FC<HabitDecorationModalProps> = ({
             </div>
           )}
 
-          {/* If an image is selected, show Preview, Caption, & Layout options */}
+          {/* If an image is selected, show Preview, Caption, Frame, and Size/Focus controls */}
           {imageUrl && (
-            <div className="p-3.5 rounded-2xl bg-[#FAF6EE] dark:bg-[#1A1C2B] border border-[#D7C9B1] dark:border-[#3C4263] space-y-3">
-              <div className="flex flex-col sm:flex-row items-center gap-3">
-                {/* Live Miniature Preview */}
-                <div className="relative shrink-0">
-                  {layout === 'polaroid' && (
-                    <div className="w-24 bg-white dark:bg-[#282C44] p-1.5 pb-2 rounded-lg shadow-md border border-[#D7C9B1] dark:border-[#3C4263] transform -rotate-2">
-                      <div className="w-full h-16 rounded-xs overflow-hidden bg-stone-100">
+            <div className="space-y-3.5">
+              {/* Frame & Caption Settings */}
+              <div className="p-3.5 rounded-2xl bg-[#FAF6EE] dark:bg-[#1A1C2B] border border-[#D7C9B1] dark:border-[#3C4263] space-y-3">
+                <div className="flex flex-col sm:flex-row items-center gap-3">
+                  
+                  {/* Live Miniature Preview with active size, focus & zoom */}
+                  <div className="relative shrink-0 flex items-center justify-center">
+                    {layout === 'polaroid' && (
+                      <div className="w-28 bg-white dark:bg-[#282C44] p-1.5 pb-2 rounded-xl shadow-md border border-[#D7C9B1] dark:border-[#3C4263] transform -rotate-1">
+                        <div className="w-full h-20 rounded-lg overflow-hidden bg-stone-100 dark:bg-stone-800 relative">
+                          <img
+                            src={imageUrl}
+                            alt="Preview"
+                            className="w-full h-full"
+                            style={{
+                              objectFit: fit,
+                              objectPosition: `${focusX}% ${focusY}%`,
+                              transform: `scale(${zoom / 100})`,
+                            }}
+                          />
+                        </div>
+                        <div className="text-[10px] font-display italic text-center text-[#4A3222] dark:text-[#E2E8F0] truncate mt-1 px-1">
+                          {imageCaption || 'Habit Photo'}
+                        </div>
+                      </div>
+                    )}
+
+                    {layout === 'frame' && (
+                      <div className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-[#8E7CC3] shadow-md bg-white dark:bg-[#282C44] p-1">
                         <img
                           src={imageUrl}
                           alt="Preview"
-                          className="w-full h-full object-cover"
+                          className="w-full h-full rounded-xl"
+                          style={{
+                            objectFit: fit,
+                            objectPosition: `${focusX}% ${focusY}%`,
+                            transform: `scale(${zoom / 100})`,
+                          }}
                         />
                       </div>
-                      <div className="text-[9px] font-display italic text-center text-[#4A3222] dark:text-[#E2E8F0] truncate mt-1">
-                        {imageCaption || 'Habit Photo'}
+                    )}
+
+                    {layout === 'sticker' && (
+                      <div className="w-24 h-24 rounded-2xl overflow-hidden p-1 bg-white dark:bg-[#282C44] shadow-md border border-dashed border-[#8E7CC3]">
+                        <img
+                          src={imageUrl}
+                          alt="Preview"
+                          className="w-full h-full rounded-xl"
+                          style={{
+                            objectFit: fit,
+                            objectPosition: `${focusX}% ${focusY}%`,
+                            transform: `scale(${zoom / 100})`,
+                          }}
+                        />
                       </div>
-                    </div>
-                  )}
-
-                  {layout === 'frame' && (
-                    <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-[#8E7CC3] shadow-md">
-                      <img
-                        src={imageUrl}
-                        alt="Preview"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-
-                  {layout === 'sticker' && (
-                    <div className="w-20 h-20 rounded-2xl overflow-hidden p-1 bg-white dark:bg-[#282C44] shadow-md border border-dashed border-[#8E7CC3]">
-                      <img
-                        src={imageUrl}
-                        alt="Preview"
-                        className="w-full h-full object-cover rounded-xl"
-                      />
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex-1 w-full space-y-2">
-                  <div>
-                    <label className="text-[11px] font-bold text-[#735A46] dark:text-[#94A3B8] font-body block mb-1">
-                      Photo Caption / Subtitle
-                    </label>
-                    <input
-                      type="text"
-                      value={imageCaption}
-                      onChange={(e) => setImageCaption(e.target.value)}
-                      placeholder="e.g., Morning Focus ☕"
-                      maxLength={30}
-                      className="w-full px-3 py-1.5 rounded-xl bg-white dark:bg-[#161825] border border-[#D7C9B1] dark:border-[#3C4263] text-xs font-body text-[#4A3222] dark:text-[#E2E8F0] focus:outline-none focus:border-[#8E7CC3]"
-                    />
+                    )}
                   </div>
 
-                  <div>
-                    <label className="text-[11px] font-bold text-[#735A46] dark:text-[#94A3B8] font-body block mb-1">
-                      Display Frame Style
-                    </label>
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => setLayout('polaroid')}
-                        className={`px-2.5 py-1 rounded-lg text-[11px] font-bold font-body transition-all ${
-                          layout === 'polaroid'
-                            ? 'bg-[#8E7CC3] text-white shadow-2xs'
-                            : 'bg-white dark:bg-[#23273C] text-[#735A46] dark:text-[#94A3B8] border border-[#D7C9B1] dark:border-[#3C4263]'
-                        }`}
-                      >
-                        Polaroid
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setLayout('frame')}
-                        className={`px-2.5 py-1 rounded-lg text-[11px] font-bold font-body transition-all ${
-                          layout === 'frame'
-                            ? 'bg-[#8E7CC3] text-white shadow-2xs'
-                            : 'bg-white dark:bg-[#23273C] text-[#735A46] dark:text-[#94A3B8] border border-[#D7C9B1] dark:border-[#3C4263]'
-                        }`}
-                      >
-                        Framed
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setLayout('sticker')}
-                        className={`px-2.5 py-1 rounded-lg text-[11px] font-bold font-body transition-all ${
-                          layout === 'sticker'
-                            ? 'bg-[#8E7CC3] text-white shadow-2xs'
-                            : 'bg-white dark:bg-[#23273C] text-[#735A46] dark:text-[#94A3B8] border border-[#D7C9B1] dark:border-[#3C4263]'
-                        }`}
-                      >
-                        Sticker
-                      </button>
+                  <div className="flex-1 w-full space-y-2">
+                    <div>
+                      <label className="text-[11px] font-bold text-[#735A46] dark:text-[#94A3B8] font-body block mb-1">
+                        Photo Caption / Subtitle
+                      </label>
+                      <input
+                        type="text"
+                        value={imageCaption}
+                        onChange={(e) => setImageCaption(e.target.value)}
+                        placeholder="e.g., Morning Focus ☕"
+                        maxLength={30}
+                        className="w-full px-3 py-1.5 rounded-xl bg-white dark:bg-[#161825] border border-[#D7C9B1] dark:border-[#3C4263] text-xs font-body text-[#4A3222] dark:text-[#E2E8F0] focus:outline-none focus:border-[#8E7CC3]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[11px] font-bold text-[#735A46] dark:text-[#94A3B8] font-body block mb-1">
+                        Display Frame Style
+                      </label>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => setLayout('polaroid')}
+                          className={`flex-1 py-1 rounded-lg text-[11px] font-bold font-body transition-all ${
+                            layout === 'polaroid'
+                              ? 'bg-[#8E7CC3] text-white shadow-2xs'
+                              : 'bg-white dark:bg-[#23273C] text-[#735A46] dark:text-[#94A3B8] border border-[#D7C9B1] dark:border-[#3C4263]'
+                          }`}
+                        >
+                          Polaroid
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setLayout('frame')}
+                          className={`flex-1 py-1 rounded-lg text-[11px] font-bold font-body transition-all ${
+                            layout === 'frame'
+                              ? 'bg-[#8E7CC3] text-white shadow-2xs'
+                              : 'bg-white dark:bg-[#23273C] text-[#735A46] dark:text-[#94A3B8] border border-[#D7C9B1] dark:border-[#3C4263]'
+                          }`}
+                        >
+                          Framed
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setLayout('sticker')}
+                          className={`flex-1 py-1 rounded-lg text-[11px] font-bold font-body transition-all ${
+                            layout === 'sticker'
+                              ? 'bg-[#8E7CC3] text-white shadow-2xs'
+                              : 'bg-white dark:bg-[#23273C] text-[#735A46] dark:text-[#94A3B8] border border-[#D7C9B1] dark:border-[#3C4263]'
+                          }`}
+                        >
+                          Sticker
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
+
+              {/* Dedicated Image Size & Focus Framing Controls */}
+              <ImageSizeAndFocusAdjuster
+                size={size}
+                onChangeSize={setSize}
+                zoom={zoom}
+                onChangeZoom={setZoom}
+                focusX={focusX}
+                onChangeFocusX={setFocusX}
+                focusY={focusY}
+                onChangeFocusY={setFocusY}
+                fit={fit}
+                onChangeFit={setFit}
+                previewUrl={imageUrl}
+              />
             </div>
           )}
         </div>

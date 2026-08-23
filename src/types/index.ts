@@ -74,6 +74,11 @@ export interface Task {
   imageUrl?: string;
   imageLayout?: BujoImageLayout;
   imageCaption?: string;
+  imageSize?: 'sm' | 'md' | 'lg' | 'xl';
+  imageZoom?: number; // 100 to 250
+  imageFocusX?: number; // 0 to 100
+  imageFocusY?: number; // 0 to 100
+  imageFit?: 'cover' | 'contain';
 }
 
 export type PomodoroMode = 'focus' | 'shortBreak' | 'longBreak';
