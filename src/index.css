@@ -1,0 +1,139 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --color-violet: #8E7CC3;
+    --color-violet-light: #F2EFF9;
+    --color-violet-dark: #5A4688;
+    --color-coral: #FF8E7E;
+    --color-coral-light: #FFF0ED;
+    --color-gold: #F4B843;
+    --color-gold-light: #FEF6E4;
+    --color-cream: #FFFDF8;
+    --color-parchment: #F7F1E3;
+    --color-bark: #4D3222;
+    --color-navy: #2A456C;
+  }
+
+  .dark {
+    --color-violet-light: #252136;
+    --color-cream: #1A1C2B;
+    --color-parchment: #222538;
+    --color-bark: #E2E8F0;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: #FAF8F5;
+    background-image: 
+      radial-gradient(#D3CBEC 0.75px, transparent 0.75px),
+      radial-gradient(#D3CBEC 0.75px, #FAF8F5 0.75px);
+    background-size: 30px 30px;
+    background-position: 0 0, 15px 15px;
+    color: #3B2A1E;
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  html.dark body,
+  .dark body,
+  body.dark {
+    background-color: #12131F !important;
+    background-image: 
+      radial-gradient(#2E324D 0.75px, transparent 0.75px),
+      radial-gradient(#2E324D 0.75px, #12131F 0.75px) !important;
+    color: #E2E8F0 !important;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: 'Fraunces', serif;
+    font-feature-settings: "swsh" 1, "ss01" 1;
+  }
+
+  .font-body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  .font-numeric {
+    font-family: 'Space Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Cozy Storybook Shadows & Borders */
+.cozy-card-shadow {
+  box-shadow: 0 8px 24px -4px rgba(42, 69, 108, 0.12), 0 3px 6px -2px rgba(42, 69, 108, 0.08);
+}
+
+.dark .cozy-card-shadow {
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.45), 0 3px 6px -2px rgba(0, 0, 0, 0.3);
+}
+
+.cozy-button-shadow {
+  box-shadow: 0 4px 0px 0px rgba(77, 50, 34, 0.25);
+}
+
+.dark .cozy-button-shadow {
+  box-shadow: 0 4px 0px 0px rgba(0, 0, 0, 0.4);
+}
+
+.cozy-button-shadow:active {
+  box-shadow: 0 1px 0px 0px rgba(77, 50, 34, 0.25);
+  transform: translateY(3px);
+}
+
+.cozy-outline {
+  border: 2px solid #5C3E28;
+}
+
+.cozy-outline-violet {
+  border: 2px solid #8E7CC3;
+}
+
+.cozy-outline-soft {
+  border: 2px solid #D9CBB6;
+}
+
+.dark .cozy-outline-soft {
+  border: 2px solid #383D59;
+}
+
+/* Notebook Spiral Holes */
+.spiral-holes {
+  background-image: radial-gradient(circle at 10px 12px, #362215 4px, transparent 5px);
+  background-size: 100% 24px;
+}
+
+.dark .spiral-holes {
+  background-image: radial-gradient(circle at 10px 12px, #0F101A 4px, transparent 5px);
+  background-size: 100% 24px;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #C4BAE5;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #A99CD4;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #3E4366;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #565C8C;
+}
+
+input[type=range] {
+  accent-color: #8E7CC3;
+}

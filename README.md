@@ -1,2 +1,2 @@
-# Haabit
-habit web for personal practice
+# Habit
+habit

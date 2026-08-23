@@ -1,0 +1,6 @@
+{
+  "name": "Komorebi - Pomodoro & Habit Tracker",
+  "description": "Aplicación PWA de seguimiento de hábitos, temporizador Pomodoro personalizable con fondos de enfoque, schedule diario, estadísticas detalladas y widgets.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

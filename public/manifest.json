@@ -1,0 +1,40 @@
+{
+  "name": "Aurora — Mindful Habits & Journal",
+  "short_name": "Aurora",
+  "description": "Mindful daily habit tracker, bullet journal, focus sessions, and scrapbooking planner.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAF8F5",
+  "theme_color": "#FAF6EE",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/pwa-icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Focus Timer",
+      "url": "/?tab=pomodoro",
+      "description": "Start a 25-minute mindful focus session"
+    },
+    {
+      "name": "Daily Habits",
+      "url": "/?tab=habits",
+      "description": "View and complete your daily rituals"
+    },
+    {
+      "name": "Journal & Tasks",
+      "url": "/?tab=tasks",
+      "description": "Open your bullet journal and memories log"
+    },
+    {
+      "name": "Timeline",
+      "url": "/?tab=schedule",
+      "description": "View daily chronological schedule"
+    }
+  ]
+}
